@@ -44,10 +44,12 @@ public class Server extends NanoHTTPD {
         Log.d(TAG, "Request received!");
 
         Map<String, String> headers = session.getHeaders();
-        String uri = session.getUri();
-        File f = new File(this.root, uri);
-        if (f.exists()) {
-            return serveFile(uri, headers, f);
+        if (this.root != null) {
+            String uri = session.getUri();
+            File f = new File(this.root, uri);
+            if (f.exists()) {
+                return serveFile(uri, headers, f);
+            }
         }
         return serveNoFile(session);
     }
