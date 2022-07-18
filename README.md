@@ -9,6 +9,8 @@ The library can be useful for handling requests with `application/json` content 
 
 Since 0.6.0 can handle millions of requests at the same time and also includes some very basic support for [React Native QT](https://github.com/status-im/react-native-desktop). 
 
+Since 0.7.0 can delivery files too. The folder directory could be passed as parameter of the 'start' function.
+
 ## Install
 
 ```shell
@@ -34,13 +36,13 @@ First import/require react-native-http-server:
 ```
 
 
-Initalize the server in the `componentWillMount` lifecycle method. You need to provide a `port` and a callback.
+Initalize the server in the `componentWillMount` lifecycle method. You need to provide a `port` and a callback. Optionally, you can provide a folder directory to delivery files from it.
 
 ```js
 
     componentWillMount() {
       // initalize the server (now accessible via localhost:1234)
-      httpBridge.start(5561, 'http_service' request => {
+      httpBridge.start(5561, 'http_service', 'folder_directory', request => {
 
           // you can use request.url, request.type and request.postData here
           if (request.type === "GET" && request.url.split("/")[1] === "users") {
