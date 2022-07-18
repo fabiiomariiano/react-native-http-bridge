@@ -38,8 +38,8 @@ public class HttpServerModule extends ReactContextBaseJavaModule implements Life
         Log.d(MODULE_NAME, "Initializing server...");
         this.port = port;
 
-        if (root != null){
-            if (root.startsWith("/") || root.startsWith("file:///"))) {
+        if (root != null) {
+            if ((root.startsWith("/") || root.startsWith("file:///"))) {
                 www_root = new File(root);
                 localPath = www_root.getAbsolutePath();
             } else {
