@@ -46,9 +46,14 @@ public class Server extends NanoHTTPD {
         Map<String, String> headers = session.getHeaders();
         if (this.root != null) {
             String uri = session.getUri();
-            File f = new File(this.root, uri);
-            if (f.exists()) {
-                return serveFile(uri, headers, f);
+            File file = new File(this.root, uri);
+            if (file.exists()) {
+                return serveFile(uri, headers, file);
+            } else if (hasParameterToFindFileWithoutExtension(session)) {
+                File fileWithoutExtension = getFileWithoutExtension(uri);
+                if (fileWithoutExtension != null) {
+                    return serveFile(uri, headers, fileWithoutExtension);
+                }
             }
         }
         return serveNoFile(session);
@@ -83,6 +88,27 @@ public class Server extends NanoHTTPD {
 
     public void respond(String requestId, int code, String type, String body) {
         responses.put(requestId, newFixedLengthResponse(Status.lookup(code), type, body));
+    }
+
+    private boolean hasParameterToFindFileWithoutExtension(IHTTPSession session) {
+        String parameterKey = "checkFileWithoutExtension";
+        if (session.getParameters().containsKey(parameterKey)) {
+            String parameterValue = session.getParameters().get(parameterKey).get(0);
+            return parameterValue.toLowerCase().equals("true");
+        }
+        return false;
+    }
+
+    private File getFileWithoutExtension(String uri) {
+        String[] fileNameSplitedByDot = uri.split("\\.");
+        File fileWithoutExtension = null;
+        if (fileNameSplitedByDot.length > 0) {
+            fileWithoutExtension = new File(this.root, fileNameSplitedByDot[0]);
+            if (fileWithoutExtension.exists()) {
+                return fileWithoutExtension;
+            }
+        }
+        return fileWithoutExtension;
     }
 
     private WritableMap fillRequestMap(IHTTPSession session, String requestId) throws Exception {

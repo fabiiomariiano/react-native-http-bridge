@@ -9,7 +9,7 @@ The library can be useful for handling requests with `application/json` content 
 
 Since 0.6.0 can handle millions of requests at the same time and also includes some very basic support for [React Native QT](https://github.com/status-im/react-native-desktop). 
 
-Since 0.7.0 can delivery files too. The folder directory could be passed as parameter of the 'start' function.
+Since 0.7.0 can delivery files too. The folder directory could be passed as parameter of the 'start' function. Additionally, can be passed a parameter when request files to try find it in root directory without it extension.
 
 ## Install
 
@@ -54,6 +54,19 @@ Initalize the server in the `componentWillMount` lifecycle method. You need to p
       });
     }
 
+```
+
+To check too with file exists in the root directory without it extension, just add the parameter `checkFileWithoutExtension` with `true` value. And the server will check at first if file exists with all name passed, and after, if it has extension, check if file exists without it. Example:
+
+```js
+
+  <video
+    id="video-id" 
+    alt="video-test"
+    muted
+    autoplay
+    src={`/${fileName}.mp4?checkFileWithoutExtension=true`}
+  />
 ```
 
 Finally, ensure that you disable the server when your component is being unmounted.
