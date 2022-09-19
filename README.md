@@ -11,6 +11,8 @@ Since 0.6.0 can handle millions of requests at the same time and also includes s
 
 Since 0.7.0 can delivery files too. The folder directory could be passed as parameter of the 'start' function. Additionally, can be passed a parameter when request files to try find it in root directory without it extension.
 
+Since 0.8.0 can enable to delivery files in parts as chunks.
+
 ## Install
 
 ```shell
@@ -42,16 +44,20 @@ Initalize the server in the `componentWillMount` lifecycle method. You need to p
 
     componentWillMount() {
       // initalize the server (now accessible via localhost:1234)
-      httpBridge.start(5561, 'http_service', 'folder_directory', request => {
-
+      httpBridge.start(
+        5561,
+        'http_service',
+        request => {
           // you can use request.url, request.type and request.postData here
           if (request.type === "GET" && request.url.split("/")[1] === "users") {
             httpBridge.respond(request.requestId, 200, "application/json", "{\"message\": \"OK\"}");
           } else {
             httpBridge.respond(request.requestId, 400, "application/json", "{\"message\": \"Bad Request\"}");
           }
-
-      });
+        },
+        'folder_directory',
+        isEnabledForDeliveryFilesInParts
+      );
     }
 
 ```
