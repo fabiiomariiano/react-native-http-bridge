@@ -34,7 +34,7 @@ public class HttpServerModule extends ReactContextBaseJavaModule implements Life
     }
 
     @ReactMethod
-    public void start(int port, String serviceName, String root) {
+    public void start(int port, String serviceName, String root, boolean isEnabledForDeliveryFilesInParts) {
         Log.d(MODULE_NAME, "Initializing server...");
         this.port = port;
 
@@ -48,7 +48,7 @@ public class HttpServerModule extends ReactContextBaseJavaModule implements Life
             }
         }
 
-        startServer(www_root);
+        startServer(www_root, isEnabledForDeliveryFilesInParts);
     }
 
     @ReactMethod
@@ -80,13 +80,13 @@ public class HttpServerModule extends ReactContextBaseJavaModule implements Life
         stopServer();
     }
 
-    private void startServer(File www_root) {
+    private void startServer(File www_root, boolean isEnabledForDeliveryFilesInParts) {
         if (this.port == 0) {
             return;
         }
 
         if (server == null) {
-            server = new Server(reactContext, port, www_root);
+            server = new Server(reactContext, port, www_root, isEnabledForDeliveryFilesInParts);
         }
         try {
             server.start();

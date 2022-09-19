@@ -3,8 +3,9 @@ declare module "react-native-http-bridge";
 export declare function start(
   port: number,
   serviceName: string,
+  callback: (request: Request) => void,
   wwwroot?: string,
-  callback: (request: Request) => void
+  isEnabledForDeliveryFilesInParts?: boolean,
 ): void;
 
 export declare interface Request {

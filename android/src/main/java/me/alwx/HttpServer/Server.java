@@ -29,12 +29,14 @@ public class Server extends NanoHTTPD {
     private ReactContext reactContext;
     private Map<String, Response> responses;
     private File root;
+    private boolean isEnabledForDeliveryFilesInParts;
 
-    public Server(ReactContext context, int port, File wwwroot) {
+    public Server(ReactContext context, int port, File wwwroot, boolean isEnabledForDeliveryFilesInParts) {
         super(port);
         reactContext = context;
         responses = new HashMap<>();
         this.root = wwwroot;
+        this.isEnabledForDeliveryFilesInParts = isEnabledForDeliveryFilesInParts;
 
         Log.d(TAG, "Server started");
     }
@@ -49,7 +51,7 @@ public class Server extends NanoHTTPD {
             File file = new File(this.root, uri);
             if (file.exists()) {
                 return serveFile(uri, headers, file);
-            } else if (hasParameterToFindFileWithoutExtension(session)) {
+            } else {
                 File fileWithoutExtension = getFileWithoutExtension(uri);
                 if (fileWithoutExtension != null) {
                     return serveFile(uri, headers, fileWithoutExtension);
@@ -90,19 +92,10 @@ public class Server extends NanoHTTPD {
         responses.put(requestId, newFixedLengthResponse(Status.lookup(code), type, body));
     }
 
-    private boolean hasParameterToFindFileWithoutExtension(IHTTPSession session) {
-        String parameterKey = "checkFileWithoutExtension";
-        if (session.getParameters().containsKey(parameterKey)) {
-            String parameterValue = session.getParameters().get(parameterKey).get(0);
-            return parameterValue.toLowerCase().equals("true");
-        }
-        return false;
-    }
-
     private File getFileWithoutExtension(String uri) {
         String[] fileNameSplitedByDot = uri.split("\\.");
         File fileWithoutExtension = null;
-        if (fileNameSplitedByDot.length > 0) {
+        if (fileNameSplitedByDot.length == 2) {
             fileWithoutExtension = new File(this.root, fileNameSplitedByDot[0]);
             if (fileWithoutExtension.exists()) {
                 return fileWithoutExtension;
@@ -160,7 +153,7 @@ public class Server extends NanoHTTPD {
 
             // Change return code and add Content-Range header when skipping is requested
             long fileLen = file.length();
-            if (range != null && startFrom >= 0) {
+            if (this.isEnabledForDeliveryFilesInParts && range != null && startFrom >= 0) {
                 if (startFrom >= fileLen) {
                     res = newFixedLengthResponse(Response.Status.RANGE_NOT_SATISFIABLE, MIME_PLAINTEXT, "");
                     res.addHeader("Content-Range", "bytes 0-0/" + fileLen);
